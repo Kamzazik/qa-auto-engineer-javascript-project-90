@@ -1,6 +1,7 @@
 export class UsersPage {
   constructor(page) {
     this.page = page;
+    this.tabUsers = page.getByTestId('tab-users');
     this.createUserButton = page.getByTestId('create-user-button');
     this.userForm = page.getByTestId('user-form');
     this.firstNameInput = page.getByTestId('user-firstname-input');
@@ -12,6 +13,10 @@ export class UsersPage {
     this.usersTable = page.getByTestId('users-table');
     this.selectAllCheckbox = page.getByTestId('select-all-checkbox');
     this.deleteSelectedButton = page.getByTestId('delete-selected-button');
+  }
+
+  async goToTab() {
+    await this.tabUsers.click();
   }
 
   async openCreateForm() {
