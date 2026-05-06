@@ -19,7 +19,7 @@ function App() {
   };
 
   // --- Вкладки ---
-  const [activeTab, setActiveTab] = useState('statuses');
+  const [activeTab, setActiveTab] = useState('labels');
 
   // --- Пользователи ---
   const [users, setUsers] = useState([]);
@@ -121,6 +121,53 @@ function App() {
     setSelectedStatuses(selectedStatuses.length === statuses.length ? [] : statuses.map((s) => s.id));
   };
 
+  // --- Метки ---
+  const [labels, setLabels] = useState([]);
+  const [showLabelForm, setShowLabelForm] = useState(false);
+  const [editingLabel, setEditingLabel] = useState(null);
+  const [labelForm, setLabelForm] = useState({ name: '' });
+  const [selectedLabels, setSelectedLabels] = useState([]);
+
+  const handleLabelFormChange = (field, value) => {
+    setLabelForm({ ...labelForm, [field]: value });
+  };
+
+  const openCreateLabelForm = () => {
+    setEditingLabel(null);
+    setLabelForm({ name: '' });
+    setShowLabelForm(true);
+  };
+
+  const openEditLabelForm = (label) => {
+    setEditingLabel(label);
+    setLabelForm({ name: label.name });
+    setShowLabelForm(true);
+  };
+
+  const saveLabel = (e) => {
+    e.preventDefault();
+    if (!labelForm.name) return;
+    if (editingLabel) {
+      setLabels(labels.map((l) => (l.id === editingLabel.id ? { ...editingLabel, ...labelForm } : l)));
+    } else {
+      setLabels([...labels, { id: Date.now(), ...labelForm }]);
+    }
+    setShowLabelForm(false);
+  };
+
+  const deleteSelectedLabels = () => {
+    setLabels(labels.filter((l) => !selectedLabels.includes(l.id)));
+    setSelectedLabels([]);
+  };
+
+  const toggleSelectLabel = (id) => {
+    setSelectedLabels((prev) => prev.includes(id) ? prev.filter((lid) => lid !== id) : [...prev, id]);
+  };
+
+  const selectAllLabels = () => {
+    setSelectedLabels(selectedLabels.length === labels.length ? [] : labels.map((l) => l.id));
+  };
+
   // --- Рендер ---
   if (!isLoggedIn) {
     return (
@@ -152,14 +199,56 @@ function App() {
         </div>
       </header>
 
-      {/* Вкладки */}
       <nav>
+        <button onClick={() => setActiveTab('labels')} data-testid="tab-labels">Метки</button>
         <button onClick={() => setActiveTab('statuses')} data-testid="tab-statuses">Статусы</button>
         <button onClick={() => setActiveTab('users')} data-testid="tab-users">Пользователи</button>
       </nav>
 
       <main>
-        {/* --- Вкладка Статусы --- */}
+        {/* --- Метки --- */}
+        {activeTab === 'labels' && (
+          <div>
+            <h2>Метки</h2>
+            <button onClick={openCreateLabelForm} data-testid="create-label-button">Создать метку</button>
+            {selectedLabels.length > 0 && (
+              <button onClick={deleteSelectedLabels} data-testid="delete-labels-selected-button">
+                Удалить выбранных ({selectedLabels.length})
+              </button>
+            )}
+            {showLabelForm && (
+              <form onSubmit={saveLabel} data-testid="label-form">
+                <h3>{editingLabel ? 'Редактировать' : 'Создать'} метку</h3>
+                <div>
+                  <label htmlFor="labelName">Название:</label>
+                  <input id="labelName" type="text" value={labelForm.name} onChange={(e) => handleLabelFormChange('name', e.target.value)} data-testid="label-name-input" />
+                </div>
+                <button type="submit" data-testid="save-label-button">Сохранить</button>
+                <button type="button" onClick={() => setShowLabelForm(false)} data-testid="cancel-label-button">Отмена</button>
+              </form>
+            )}
+            <table data-testid="labels-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" checked={selectedLabels.length === labels.length && labels.length > 0} onChange={selectAllLabels} data-testid="select-all-labels-checkbox" /></th>
+                  <th>Название</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {labels.map((l) => (
+                  <tr key={l.id} data-testid={`label-row-${l.id}`}>
+                    <td><input type="checkbox" checked={selectedLabels.includes(l.id)} onChange={() => toggleSelectLabel(l.id)} data-testid={`select-label-${l.id}`} /></td>
+                    <td data-testid={`label-name-${l.id}`}>{l.name}</td>
+                    <td><button onClick={() => openEditLabelForm(l)} data-testid={`edit-label-${l.id}`}>Редактировать</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* --- Статусы --- */}
         {activeTab === 'statuses' && (
           <div>
             <h2>Статусы</h2>
@@ -207,7 +296,7 @@ function App() {
           </div>
         )}
 
-        {/* --- Вкладка Пользователи --- */}
+        {/* --- Пользователи --- */}
         {activeTab === 'users' && (
           <div>
             <h2>Пользователи</h2>
