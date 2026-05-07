@@ -1,7 +1,8 @@
-export class LabelsPage {
+import { BasePage } from './BasePage.js';
+
+export class LabelsPage extends BasePage {
   constructor(page) {
-    this.page = page;
-    this.tabLabels = page.getByTestId('tab-labels');
+    super(page);
     this.createLabelButton = page.getByTestId('create-label-button');
     this.labelForm = page.getByTestId('label-form');
     this.nameInput = page.getByTestId('label-name-input');
@@ -13,7 +14,7 @@ export class LabelsPage {
   }
 
   async goToTab() {
-    await this.tabLabels.click();
+    await this.clickTab('labels');
   }
 
   async openCreateForm() {
@@ -38,10 +39,6 @@ export class LabelsPage {
     await this.page.getByTestId(`edit-label-${id}`).click();
     await this.nameInput.fill(name);
     await this.save();
-  }
-
-  async getLabelName(id) {
-    return await this.page.getByTestId(`label-name-${id}`).textContent();
   }
 
   async selectLabel(id) {

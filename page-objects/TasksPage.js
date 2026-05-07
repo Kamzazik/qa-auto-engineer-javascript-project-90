@@ -1,7 +1,8 @@
-export class TasksPage {
+import { BasePage } from './BasePage.js';
+
+export class TasksPage extends BasePage {
   constructor(page) {
-    this.page = page;
-    this.tabTasks = page.getByTestId('tab-tasks');
+    super(page);
     this.createTaskButton = page.getByTestId('create-task-button');
     this.taskForm = page.getByTestId('task-form');
     this.titleInput = page.getByTestId('task-title-input');
@@ -17,7 +18,7 @@ export class TasksPage {
   }
 
   async goToTab() {
-    await this.tabTasks.click();
+    await this.clickTab('tasks');
   }
 
   async openCreateForm() {
@@ -48,14 +49,6 @@ export class TasksPage {
     await this.save();
   }
 
-  async getTaskTitle(id) {
-    return await this.page.getByTestId(`task-title-${id}`).textContent();
-  }
-
-  async getTaskAssignee(id) {
-    return await this.page.getByTestId(`task-assignee-${id}`).textContent();
-  }
-
   async selectTask(id) {
     await this.page.getByTestId(`select-task-${id}`).check();
   }
@@ -74,16 +67,9 @@ export class TasksPage {
     return (await column.getAttribute('data-testid')).replace('column-', '');
   }
 
-  async dragTaskToColumn(taskId, columnId) {
-    const task = this.page.getByTestId(`task-card-${taskId}`);
-    const column = this.page.getByTestId(`column-${columnId}`);
-    await task.dragTo(column);
-  }
-
   async isTaskInColumn(taskId, columnId) {
     const column = this.page.getByTestId(`column-${columnId}`);
-    const task = column.getByTestId(`task-card-${taskId}`);
-    return await task.isVisible();
+    return await column.getByTestId(`task-card-${taskId}`).isVisible();
   }
 
   async filterByStatus(statusId) {

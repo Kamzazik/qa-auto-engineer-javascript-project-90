@@ -1,7 +1,8 @@
-export class StatusesPage {
+import { BasePage } from './BasePage.js';
+
+export class StatusesPage extends BasePage {
   constructor(page) {
-    this.page = page;
-    this.tabStatuses = page.getByTestId('tab-statuses');
+    super(page);
     this.createStatusButton = page.getByTestId('create-status-button');
     this.statusForm = page.getByTestId('status-form');
     this.nameInput = page.getByTestId('status-name-input');
@@ -14,7 +15,7 @@ export class StatusesPage {
   }
 
   async goToTab() {
-    await this.tabStatuses.click();
+    await this.clickTab('statuses');
   }
 
   async openCreateForm() {
@@ -41,13 +42,6 @@ export class StatusesPage {
     await this.nameInput.fill(name);
     await this.slugInput.fill(slug);
     await this.save();
-  }
-
-  async getStatusInfo(id) {
-    return {
-      name: await this.page.getByTestId(`status-name-${id}`).textContent(),
-      slug: await this.page.getByTestId(`status-slug-${id}`).textContent(),
-    };
   }
 
   async selectStatus(id) {

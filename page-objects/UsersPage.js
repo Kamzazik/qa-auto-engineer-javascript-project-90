@@ -1,7 +1,8 @@
-export class UsersPage {
+import { BasePage } from './BasePage.js';
+
+export class UsersPage extends BasePage {
   constructor(page) {
-    this.page = page;
-    this.tabUsers = page.getByTestId('tab-users');
+    super(page);
     this.createUserButton = page.getByTestId('create-user-button');
     this.userForm = page.getByTestId('user-form');
     this.firstNameInput = page.getByTestId('user-firstname-input');
@@ -16,7 +17,7 @@ export class UsersPage {
   }
 
   async goToTab() {
-    await this.tabUsers.click();
+    await this.clickTab('users');
   }
 
   async openCreateForm() {
@@ -47,14 +48,6 @@ export class UsersPage {
     await this.saveUser();
   }
 
-  async getUserInfo(userId) {
-    return {
-      firstName: await this.page.getByTestId(`user-firstname-${userId}`).textContent(),
-      lastName: await this.page.getByTestId(`user-lastname-${userId}`).textContent(),
-      email: await this.page.getByTestId(`user-email-${userId}`).textContent(),
-    };
-  }
-
   async selectUser(userId) {
     await this.page.getByTestId(`select-user-${userId}`).check();
   }
@@ -65,9 +58,5 @@ export class UsersPage {
 
   async deleteSelected() {
     await this.deleteSelectedButton.click();
-  }
-
-  async isUserInTable(userId) {
-    return await this.page.getByTestId(`user-row-${userId}`).isVisible();
   }
 }

@@ -1,6 +1,8 @@
-export class LoginPage {
+import { BasePage } from './BasePage.js';
+
+export class LoginPage extends BasePage {
   constructor(page) {
-    this.page = page;
+    super(page);
     this.usernameInput = page.getByTestId('username-input');
     this.passwordInput = page.getByTestId('password-input');
     this.loginButton = page.getByTestId('login-button');
