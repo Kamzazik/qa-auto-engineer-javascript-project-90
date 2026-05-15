@@ -3,60 +3,41 @@ import { BasePage } from './BasePage.js';
 export class UsersPage extends BasePage {
   constructor(page) {
     super(page);
-    this.createUserButton = page.getByTestId('create-user-button');
-    this.userForm = page.getByTestId('user-form');
-    this.firstNameInput = page.getByTestId('user-firstname-input');
-    this.lastNameInput = page.getByTestId('user-lastname-input');
-    this.emailInput = page.getByTestId('user-email-input');
-    this.emailError = page.getByTestId('email-error');
-    this.saveUserButton = page.getByTestId('save-user-button');
-    this.cancelUserButton = page.getByTestId('cancel-user-button');
-    this.usersTable = page.getByTestId('users-table');
-    this.selectAllCheckbox = page.getByTestId('select-all-checkbox');
-    this.deleteSelectedButton = page.getByTestId('delete-selected-button');
+    this.createButton = page.getByRole('link', { name: 'Create' });
+    this.emailInput = page.getByRole('textbox', { name: 'Email' });
+    this.firstNameInput = page.getByRole('textbox', { name: 'First name' });
+    this.lastNameInput = page.getByRole('textbox', { name: 'Last name' });
+    this.saveButton = page.getByRole('button', { name: 'Save' });
   }
 
-  async goToTab() {
-    await this.clickTab('users');
+  async goTo() {
+    await this.clickSidebarItem('Users');
   }
 
-  async openCreateForm() {
-    await this.createUserButton.click();
+  async openCreate() {
+    await this.createButton.click();
   }
 
-  async fillUserForm(firstName, lastName, email) {
+  async createUser(email, firstName, lastName) {
+    await this.openCreate();
+    await this.emailInput.fill(email);
     await this.firstNameInput.fill(firstName);
     await this.lastNameInput.fill(lastName);
-    await this.emailInput.fill(email);
+    await this.saveButton.click();
   }
 
-  async saveUser() {
-    await this.saveUserButton.click();
+    async openEdit(email) {
+    await this.page.getByRole('cell', { name: email }).click();
   }
 
-  async createUser(firstName, lastName, email) {
-    await this.openCreateForm();
-    await this.fillUserForm(firstName, lastName, email);
-    await this.saveUser();
+  async editUser(email, newFirstName) {
+    await this.openEdit(email);
+    await this.firstNameInput.fill(newFirstName);
+    await this.saveButton.click();
   }
 
-  async editUser(userId, firstName, lastName, email) {
-    await this.page.getByTestId(`edit-user-${userId}`).click();
-    await this.firstNameInput.fill(firstName);
-    await this.lastNameInput.fill(lastName);
-    await this.emailInput.fill(email);
-    await this.saveUser();
-  }
-
-  async selectUser(userId) {
-    await this.page.getByTestId(`select-user-${userId}`).check();
-  }
-
-  async selectAllUsers() {
-    await this.selectAllCheckbox.check();
-  }
-
-  async deleteSelected() {
-    await this.deleteSelectedButton.click();
+    async deleteUser(email) {
+    await this.openEdit(email);
+    await this.page.getByRole('button', { name: 'Delete' }).click();
   }
 }

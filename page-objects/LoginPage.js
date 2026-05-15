@@ -1,21 +1,19 @@
-import { BasePage } from './BasePage.js';
-
-export class LoginPage extends BasePage {
+export class LoginPage {
   constructor(page) {
-    super(page);
-    this.usernameInput = page.getByTestId('username-input');
-    this.passwordInput = page.getByTestId('password-input');
-    this.loginButton = page.getByTestId('login-button');
-    this.loginForm = page.getByTestId('login-form');
+    this.page = page;
+    this.usernameInput = page.getByRole('textbox', { name: 'Username' });
+    this.passwordInput = page.getByRole('textbox', { name: 'Password' });
+    this.loginButton = page.getByRole('button', { name: 'Sign in' });
   }
 
   async goto() {
     await this.page.goto('/');
   }
 
-  async login(username, password) {
+  async login(username = 'admin', password = 'admin') {
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
+    await this.page.waitForTimeout(500);
   }
 }

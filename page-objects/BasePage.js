@@ -3,7 +3,8 @@ export class BasePage {
     this.page = page;
   }
 
-  async clickTab(tabName) {
-    await this.page.getByTestId(`tab-${tabName}`).click();
+  async clickSidebarItem(name) {
+    await this.page.getByRole('menuitem', { name }).click();
+    await this.page.waitForTimeout(500);
   }
 }

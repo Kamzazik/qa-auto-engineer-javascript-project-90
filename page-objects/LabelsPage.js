@@ -3,53 +3,37 @@ import { BasePage } from './BasePage.js';
 export class LabelsPage extends BasePage {
   constructor(page) {
     super(page);
-    this.createLabelButton = page.getByTestId('create-label-button');
-    this.labelForm = page.getByTestId('label-form');
-    this.nameInput = page.getByTestId('label-name-input');
-    this.saveButton = page.getByTestId('save-label-button');
-    this.cancelButton = page.getByTestId('cancel-label-button');
-    this.labelsTable = page.getByTestId('labels-table');
-    this.selectAllCheckbox = page.getByTestId('select-all-labels-checkbox');
-    this.deleteSelectedButton = page.getByTestId('delete-labels-selected-button');
+    this.createButton = page.getByRole('link', { name: 'Create' });
+    this.nameInput = page.getByRole('textbox', { name: 'Name' });
+    this.saveButton = page.getByRole('button', { name: 'Save' });
   }
 
-  async goToTab() {
-    await this.clickTab('labels');
+  async goTo() {
+    await this.clickSidebarItem('Labels');
   }
 
-  async openCreateForm() {
-    await this.createLabelButton.click();
-  }
-
-  async fillForm(name) {
-    await this.nameInput.fill(name);
-  }
-
-  async save() {
-    await this.saveButton.click();
+  async openCreate() {
+    await this.createButton.click();
   }
 
   async createLabel(name) {
-    await this.openCreateForm();
-    await this.fillForm(name);
-    await this.save();
-  }
-
-  async editLabel(id, name) {
-    await this.page.getByTestId(`edit-label-${id}`).click();
+    await this.openCreate();
     await this.nameInput.fill(name);
-    await this.save();
+    await this.saveButton.click();
   }
 
-  async selectLabel(id) {
-    await this.page.getByTestId(`select-label-${id}`).check();
+  async openEdit(name) {
+    await this.page.getByRole('cell', { name }).click();
   }
 
-  async selectAll() {
-    await this.selectAllCheckbox.check();
+  async editLabel(oldName, newName) {
+    await this.openEdit(oldName);
+    await this.nameInput.fill(newName);
+    await this.saveButton.click();
   }
 
-  async deleteSelected() {
-    await this.deleteSelectedButton.click();
+  async deleteLabel(name) {
+    await this.openEdit(name);
+    await this.page.getByRole('button', { name: 'Delete' }).click();
   }
 }

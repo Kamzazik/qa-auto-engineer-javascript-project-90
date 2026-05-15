@@ -3,84 +3,35 @@ import { BasePage } from './BasePage.js';
 export class TasksPage extends BasePage {
   constructor(page) {
     super(page);
-    this.createTaskButton = page.getByTestId('create-task-button');
-    this.taskForm = page.getByTestId('task-form');
-    this.titleInput = page.getByTestId('task-title-input');
-    this.descriptionInput = page.getByTestId('task-description-input');
-    this.assigneeInput = page.getByTestId('task-assignee-input');
-    this.statusSelect = page.getByTestId('task-status-select');
-    this.saveButton = page.getByTestId('save-task-button');
-    this.cancelButton = page.getByTestId('cancel-task-button');
-    this.kanbanBoard = page.getByTestId('kanban-board');
-    this.deleteSelectedButton = page.getByTestId('delete-tasks-selected-button');
-    this.filterStatus = page.getByTestId('filter-status');
-    this.filterLabel = page.getByTestId('filter-label');
+    this.createButton = page.getByRole('link', { name: 'Create' });
+    this.titleInput = page.getByRole('textbox', { name: 'Title' });
+    this.contentInput = page.getByRole('textbox', { name: 'Content' });
+    this.saveButton = page.getByRole('button', { name: 'Save' });
   }
 
-  async goToTab() {
-    await this.clickTab('tasks');
+  async goTo() {
+    await this.clickSidebarItem('Tasks');
   }
 
-  async openCreateForm() {
-    await this.createTaskButton.click();
+  async openCreate() {
+    await this.createButton.click();
   }
 
-  async fillForm(title, description = '', assignee = '') {
+  async createTask(title, content = '') {
+    await this.openCreate();
     await this.titleInput.fill(title);
-    await this.descriptionInput.fill(description);
-    await this.assigneeInput.fill(assignee);
-  }
-
-  async save() {
+    if (content) await this.contentInput.fill(content);
     await this.saveButton.click();
   }
 
-  async createTask(title, description = '', assignee = '') {
-    await this.openCreateForm();
-    await this.fillForm(title, description, assignee);
-    await this.save();
+  async editTask(oldTitle, newTitle) {
+    await this.page.getByRole('button', { name: 'Edit' }).first().click();
+    await this.titleInput.fill(newTitle);
+    await this.saveButton.click();
   }
 
-  async editTask(id, title, description = '', assignee = '') {
-    await this.page.getByTestId(`edit-task-${id}`).click();
-    await this.titleInput.fill(title);
-    await this.descriptionInput.fill(description);
-    await this.assigneeInput.fill(assignee);
-    await this.save();
-  }
-
-  async selectTask(id) {
-    await this.page.getByTestId(`select-task-${id}`).check();
-  }
-
-  async deleteSelected() {
-    await this.deleteSelectedButton.click();
-  }
-
-  async getFirstColumnId() {
-    const column = this.page.locator('[data-testid^="column-"]').first();
-    return (await column.getAttribute('data-testid')).replace('column-', '');
-  }
-
-  async getLastColumnId() {
-    const column = this.page.locator('[data-testid^="column-"]').last();
-    return (await column.getAttribute('data-testid')).replace('column-', '');
-  }
-
-  async isTaskInColumn(taskId, columnId) {
-    const column = this.page.getByTestId(`column-${columnId}`);
-    return await column.getByTestId(`task-card-${taskId}`).isVisible();
-  }
-
-  async filterByStatus(statusId) {
-    await this.filterStatus.selectOption(statusId);
-  }
-
-  async filterByLabel(labelId) {
-    await this.filterLabel.selectOption(labelId);
-  }
-
-  async getVisibleTaskCount() {
-    return await this.page.locator('[data-testid^="task-card-"]').count();
+  async deleteTask(title) {
+    await this.page.getByRole('button', { name: 'Edit' }).first().click();
+    await this.page.getByRole('button', { name: 'Delete' }).click();
   }
 }
